@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お母さん、お誕生日おめでとう！</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Kaisei+Opti:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- オープニング演出セクション -->
+    <section id="opening-section">
+        <div class="confetti-container"></div>
+        <div class="gift-box-container">
+            <img src="images/gift-box.png" alt="プレゼントボックス" id="gift-box" class="gift-box">
+            <button id="open-gift" class="hidden">開ける</button>
+        </div>
+    </section>
+
+    <!-- 誕生日おめでとうセクション -->
+    <section id="main-message-section" class="hidden">
+        <div class="background-image"></div>
+        <div class="message-container">
+            <h1 class="handwritten-text">お母さん、お誕生日おめでとう！</h1>
+            <p class="sub-message">いつもありがとう</p>
+            <div class="floating-elements">
+                <div class="flower-bouquet"></div>
+                <div class="bubbles"></div>
+            </div>
+            <button class="nav-button" data-target="thank-you-section">次のページへ</button>
+        </div>
+    </section>
+
+    <!-- 感謝のメッセージセクション -->
+    <section id="thank-you-section" class="hidden">
+        <div class="scrapbook-background"></div>
+        <div class="messages-container">
+            <div class="message-card" data-name="長女">
+                <div class="card-inner">
+                    <h3>長女</h3>
+                    <p>お母さん、いつも優しく見守ってくれてありがとう。</p>
+                    <div class="family-illustration"></div>
+                </div>
+            </div>
+            <div class="message-card" data-name="次女">
+                <div class="card-inner">
+                    <h3>次女</h3>
+                    <p>お母さんの笑顔が大好きです。</p>
+                    <div class="family-illustration"></div>
+                </div>
+            </div>
+            <div class="message-card" data-name="父">
+                <div class="card-inner">
+                    <h3>父</h3>
+                    <p>家族のためにいつも頑張ってくれてありがとう。</p>
+                    <div class="family-illustration"></div>
+                </div>
+            </div>
+        </div>
+        <button class="nav-button" data-target="memory-gallery-section">次のページへ</button>
+    </section>
+
+    <!-- 思い出ギャラリーセクション -->
+    <section id="memory-gallery-section" class="hidden">
+        <div class="album-background"></div>
+        <div class="gallery-container">
+            <div class="memory-item">
+                <div class="polaroid-frame">
+                    <img src="images/memory1.jpg" alt="思い出1">
+                    <p class="caption">家族旅行での一枚</p>
+                </div>
+                <div class="tape-decoration"></div>
+            </div>
+            <div class="memory-item">
+                <div class="polaroid-frame">
+                    <img src="images/memory2.jpg" alt="思い出2">
+                    <p class="caption">お母さんの得意料理</p>
+                </div>
+                <div class="tape-decoration"></div>
+            </div>
+            <div class="memory-item">
+                <div class="polaroid-frame">
+                    <img src="images/memory3.jpg" alt="思い出3">
+                    <p class="caption">大切な記念日</p>
+                </div>
+                <div class="tape-decoration"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 共通要素 -->
+    <div class="common-elements">
+        <!-- BGMコントロール -->
+        <div class="bgm-control">
+            <button id="bgm-toggle" class="icon-button">
+                <span class="music-note">♪</span>
+            </button>
+        </div>
+
+        <!-- 隠しメッセージ -->
+        <div class="hidden-message">
+            <div class="clover-icon">🍀</div>
+        </div>
+    </div>
+
+    <!-- 音声要素 -->
+    <audio id="bgm" loop>
+        <source src="audio/box_open.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="box-open-sound">
+        <source src="audio/background_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="js/script.js"></script>
+</body>
+</html> 
