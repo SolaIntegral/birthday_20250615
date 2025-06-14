@@ -3,108 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>お母さん、お誕生日おめでとう！</title>
+    <title>Happy Birthday Mom!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Kaisei+Opti:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- オープニング演出セクション -->
+    <!-- フェーズ1：オープニング演出 -->
     <section id="opening-section">
-        <div class="confetti-container"></div>
+        <div class="starry-background"></div>
         <div class="gift-box-container">
-            <img src="images/gift-box.png" alt="プレゼントボックス" id="gift-box" class="gift-box">
+            <img src="images/gift-box.png" alt="Gift Box" id="gift-box" class="gift-box">
+            <img src="images/gift-box-top.png" alt="Gift Box Top" id="gift-box-top" class="gift-box-top">
+            <div class="tap-hint">↓TAP HERE↓</div>
+        </div>
+        <div class="light-effect" id="light-effect"></div>
+        <div class="footer-text">Surprise is waiting!</div>
+    </section>
+
+    <!-- フェーズ2：メッセージ表示 -->
+    <section id="message-section" class="hidden">
+        <div class="message-container">
+            <div class="scratch-cover" id="scratch-cover">
+                <div class="message-content">
+                    <h2>Happy Birthday Mom!</h2>
+                    <p>Thank you for everything you've done for us.</p>
+                    <p>We love you so much!</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- 誕生日おめでとうセクション -->
-    <section class="main-message-section hidden">
-        <div class="message-background"></div>
-        <div class="main-message">
-            <h1>お母さん、お誕生日おめでとう！</h1>
-        </div>
-        <div class="message-shower"></div>
-        <div class="sparkle-container"></div>
-        <div class="floating-particles"></div>
-    </section>
-
-    <!-- 感謝のメッセージセクション -->
-    <section id="thank-you-section" class="hidden">
-        <div class="scrapbook-background"></div>
-        <div class="messages-container">
-            <div class="message-card" data-name="長女">
-                <div class="card-inner">
-                    <h3>長女</h3>
-                    <p>お母さん、いつも優しく見守ってくれてありがとう。</p>
-                    <div class="family-illustration"></div>
-                </div>
+    <!-- フェーズ3：アルバム -->
+    <section id="album-section" class="hidden">
+        <div class="album-container">
+            <div class="album-cover">
+                <img src="images/album_cover.jpg" alt="Album Cover">
             </div>
-            <div class="message-card" data-name="次女">
-                <div class="card-inner">
-                    <h3>次女</h3>
-                    <p>お母さんの笑顔が大好きです。</p>
-                    <div class="family-illustration"></div>
+            <div class="album-pages">
+                <div class="album-page">
+                    <div class="family-message">
+                        <img src="images/family_member_photo_1.jpg" alt="Family Photo">
+                        <p>Thank you for being the best mom in the world!</p>
+                    </div>
                 </div>
-            </div>
-            <div class="message-card" data-name="父">
-                <div class="card-inner">
-                    <h3>父</h3>
-                    <p>家族のためにいつも頑張ってくれてありがとう。</p>
-                    <div class="family-illustration"></div>
+                <div class="album-page">
+                    <div class="memory-photo">
+                        <img src="images/mothers_smile_photo.jpg" alt="Mother's Smile">
+                        <p>Your smile brightens our day!</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <button class="nav-button" data-target="memory-gallery-section">次のページへ</button>
-    </section>
-
-    <!-- 思い出ギャラリーセクション -->
-    <section id="memory-gallery-section" class="hidden">
-        <div class="album-background"></div>
-        <div class="gallery-container">
-            <div class="memory-item">
-                <div class="polaroid-frame">
-                    <img src="images/memory1.jpg" alt="思い出1">
-                    <p class="caption">家族旅行での一枚</p>
-                </div>
-                <div class="tape-decoration"></div>
-            </div>
-            <div class="memory-item">
-                <div class="polaroid-frame">
-                    <img src="images/memory2.jpg" alt="思い出2">
-                    <p class="caption">お母さんの得意料理</p>
-                </div>
-                <div class="tape-decoration"></div>
-            </div>
-            <div class="memory-item">
-                <div class="polaroid-frame">
-                    <img src="images/memory3.jpg" alt="思い出3">
-                    <p class="caption">大切な記念日</p>
-                </div>
-                <div class="tape-decoration"></div>
             </div>
         </div>
     </section>
 
     <!-- 共通要素 -->
     <div class="common-elements">
-        <!-- BGMコントロール -->
-        <div class="bgm-control">
-            <button id="bgm-toggle" class="icon-button">
-                <span class="music-note">♪</span>
-            </button>
-        </div>
-
-        <!-- 隠しメッセージ -->
-        <div class="hidden-message">
-            <div class="clover-icon">🍀</div>
-        </div>
+        <button class="bgm-control" id="bgm-control">
+            <span class="music-note" id="music-note">♪</span>
+        </button>
     </div>
 
-    <!-- 音声要素 -->
+    <!-- 音声ファイル -->
     <audio id="bgm" loop>
         <source src="audio/box_open.mp3" type="audio/mpeg">
     </audio>
     <audio id="box-open-sound">
-        <source src="audio/background_music.mp3" type="audio/mpeg">
+        <source src="audio/chime_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="page-flip-sound">
+        <source src="audio/page_flip.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="scratch-sound">
+        <source src="audio/scratch_sound.mp3" type="audio/mpeg">
     </audio>
 
     <script src="js/script.js"></script>

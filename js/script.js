@@ -1,22 +1,195 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 要素の取得
-    const giftBox = document.querySelector('.gift-box');
-    const openGiftButton = document.getElementById('open-gift');
+    const giftBox = document.getElementById('gift-box');
     const openingSection = document.getElementById('opening-section');
-    const mainMessageSection = document.getElementById('main-message-section');
-    const thankYouSection = document.getElementById('thank-you-section');
-    const memoryGallerySection = document.getElementById('memory-gallery-section');
+    const messageSection = document.getElementById('message-section');
+    const albumSection = document.getElementById('album-section');
     const bgm = document.getElementById('bgm');
     const boxOpenSound = document.getElementById('box-open-sound');
+    const pageFlipSound = document.getElementById('page-flip-sound');
+    const scratchSound = document.getElementById('scratch-sound');
+    const bgmControl = document.getElementById('bgm-control');
+    const musicNote = document.getElementById('music-note');
+    const tapHint = document.getElementById('tap-hint');
+    const floatingStars = document.getElementById('floating-stars');
     const messageCards = document.querySelectorAll('.message-card');
     const memoryItems = document.querySelectorAll('.memory-item');
     const navButtons = document.querySelectorAll('.nav-button');
-    const bgmToggle = document.getElementById('bgm-toggle');
     const cloverIcon = document.querySelector('.clover-icon');
     const confettiContainer = document.querySelector('.confetti-container');
+    const giftBoxTop = document.getElementById('gift-box-top');
+    const lightEffect = document.getElementById('light-effect');
 
     // フェードイン/フェードアウトの時間（ミリ秒）
     const FADE_DURATION = 1000;
+
+    // 状態管理
+    let isBoxOpened = false;
+    let isBgmPlaying = false;
+
+    // BGMコントロール
+    bgmControl.addEventListener('click', () => {
+        if (isBgmPlaying) {
+            bgm.pause();
+            musicNote.textContent = '♪';
+        } else {
+            bgm.play();
+            musicNote.textContent = '♫';
+        }
+        isBgmPlaying = !isBgmPlaying;
+    });
+
+    // ギフトボックスのクリックイベント
+    giftBox.addEventListener('click', () => {
+        if (isBoxOpened) return;
+        
+        // 蓋のアニメーション
+        giftBoxTop.style.opacity = '1';
+        giftBoxTop.classList.add('open');
+        
+        // 光のエフェクト
+        lightEffect.classList.add('active');
+        
+        // サウンド再生
+        boxOpenSound.play();
+        
+        // 状態更新
+        isBoxOpened = true;
+        
+        // セクション切り替え
+        setTimeout(() => {
+            openingSection.style.display = 'none';
+            messageSection.style.display = 'flex';
+        }, 1500);
+    });
+
+    // スクラッチカバー
+    const scratchCover = document.getElementById('scratch-cover');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function initScratchCover() {
+        canvas.width = scratchCover.offsetWidth;
+        canvas.height = scratchCover.offsetHeight;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        scratchCover.appendChild(canvas);
+    }
+
+    function scratch(e) {
+        if (!isDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // スクラッチ音を再生
+        if (!scratchSound.playing) {
+            scratchSound.currentTime = 0;
+            scratchSound.play();
+        }
+        
+        lastX = x;
+        lastY = y;
+    }
+
+    // タッチイベント
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        scratch(e);
+    });
+
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+    canvas.addEventListener('touchstart', (e) => {
+        isDrawing = true;
+        scratch(e);
+    });
+
+    canvas.addEventListener('touchmove', scratch);
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    // アルバムセクション
+    const albumPages = document.querySelectorAll('.album-page');
+    let currentPage = 0;
+
+    function showPage(index) {
+        albumPages.forEach((page, i) => {
+            page.style.display = i === index ? 'block' : 'none';
+        });
+        
+        // ページめくり音を再生
+        pageFlipSound.currentTime = 0;
+        pageFlipSound.play();
+    }
+
+    // スワイプ機能
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    albumSection.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    });
+
+    albumSection.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        handleSwipe();
+    });
+
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0 && currentPage < albumPages.length - 1) {
+                currentPage++;
+            } else if (diff < 0 && currentPage > 0) {
+                currentPage--;
+            }
+            showPage(currentPage);
+        }
+    }
+
+    // 初期化
+    function init() {
+        initScratchCover();
+        showPage(0);
+    }
+
+    // ページ読み込み完了時に初期化
+    window.addEventListener('load', init);
+
+    // 星の生成
+    function createStars() {
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            floatingStars.appendChild(star);
+        }
+    }
+
+    // 初期化
+    function init() {
+        // 要素の初期状態設定
+        messageSection.style.display = 'none';
+        albumSection.style.display = 'none';
+    }
+
+    // 初期化の実行
+    init();
 
     // フェードイン関数
     function fadeIn(audio, callback) {
@@ -196,35 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(createParticle, 1000);
     }
 
-    // プレゼントボックスのクリックイベント
-    giftBox.addEventListener('click', () => {
-        console.log('プレゼントボックスをクリック');
-        // プレゼントボックスを開く
-        giftBox.classList.add('open');
-        
-        // オープニングセクションをフェードアウト
-        openingSection.classList.add('fade-out');
-        
-        // 現在のBGM（box_open.mp3）をフェードアウト
-        fadeOut(bgm, () => {
-            console.log('BGM切り替え');
-            // 新しいBGM（background_music.mp3）をフェードイン
-            fadeIn(boxOpenSound);
-        });
-        
-        setTimeout(() => {
-            openingSection.classList.add('hidden');
-            openingSection.classList.remove('fade-out');
-            
-            // メインメッセージセクションを表示
-            mainMessageSection.classList.remove('hidden');
-            mainMessageSection.classList.add('fade-in');
-            
-            // メッセージシャワーを開始
-            startMessageShower();
-        }, 1000);
-    });
-
     // ナビゲーションボタンのクリックイベント
     navButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -339,31 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 300);
             });
         });
-    });
-
-    // BGMコントロール
-    const bgmControl = document.querySelector('.bgm-control');
-    let isPlaying = true;
-
-    bgmControl.addEventListener('click', () => {
-        if (isPlaying) {
-            // 現在再生中のBGMをフェードアウト
-            if (giftBox.classList.contains('open')) {
-                fadeOut(boxOpenSound);
-            } else {
-                fadeOut(bgm);
-            }
-            bgmControl.textContent = '♪';
-        } else {
-            // 現在の状態に応じて適切なBGMをフェードイン
-            if (giftBox.classList.contains('open')) {
-                fadeIn(boxOpenSound);
-            } else {
-                fadeIn(bgm);
-            }
-            bgmControl.textContent = '♫';
-        }
-        isPlaying = !isPlaying;
     });
 
     // 隠しメッセージ
