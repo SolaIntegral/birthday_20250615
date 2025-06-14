@@ -18,17 +18,14 @@
     </section>
 
     <!-- 誕生日おめでとうセクション -->
-    <section id="main-message-section" class="hidden">
-        <div class="background-image"></div>
-        <div class="message-container">
-            <h1 class="handwritten-text">お母さん、お誕生日おめでとう！</h1>
-            <p class="sub-message">いつもありがとう</p>
-            <div class="floating-elements">
-                <div class="flower-bouquet"></div>
-                <div class="bubbles"></div>
-            </div>
-            <button class="nav-button" data-target="thank-you-section">次のページへ</button>
+    <section class="main-message-section hidden">
+        <div class="message-background"></div>
+        <div class="main-message">
+            <h1>お母さん、お誕生日おめでとう！</h1>
         </div>
+        <div class="message-shower"></div>
+        <div class="sparkle-container"></div>
+        <div class="floating-particles"></div>
     </section>
 
     <!-- 感謝のメッセージセクション -->
@@ -105,10 +102,10 @@
 
     <!-- 音声要素 -->
     <audio id="bgm" loop>
-        <source src="audio/box_open.mp3" type="audio/mpeg">
+        <source src="audio/background_music.mp3" type="audio/mpeg">
     </audio>
     <audio id="box-open-sound">
-        <source src="audio/background_music.mp3" type="audio/mpeg">
+        <source src="audio/box_open.mp3" type="audio/mpeg">
     </audio>
 
     <script src="js/script.js"></script>

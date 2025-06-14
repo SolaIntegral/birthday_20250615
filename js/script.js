@@ -15,6 +15,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const cloverIcon = document.querySelector('.clover-icon');
     const confettiContainer = document.querySelector('.confetti-container');
 
+    // フェードイン/フェードアウトの時間（ミリ秒）
+    const FADE_DURATION = 1000;
+
+    // フェードイン関数
+    function fadeIn(audio, callback) {
+        audio.volume = 0;
+        audio.play();
+        
+        let startTime = null;
+        function fadeInStep(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const volume = Math.min(progress / FADE_DURATION, 1);
+            
+            audio.volume = volume;
+            
+            if (progress < FADE_DURATION) {
+                requestAnimationFrame(fadeInStep);
+            } else if (callback) {
+                callback();
+            }
+        }
+        
+        requestAnimationFrame(fadeInStep);
+    }
+
+    // フェードアウト関数
+    function fadeOut(audio, callback) {
+        let startTime = null;
+        const startVolume = audio.volume;
+        
+        function fadeOutStep(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const volume = Math.max(startVolume * (1 - progress / FADE_DURATION), 0);
+            
+            audio.volume = volume;
+            
+            if (progress < FADE_DURATION) {
+                requestAnimationFrame(fadeOutStep);
+            } else {
+                audio.pause();
+                if (callback) callback();
+            }
+        }
+        
+        requestAnimationFrame(fadeOutStep);
+    }
+
+    // 初期BGMのフェードイン（box_open.mp3）
+    window.addEventListener('load', () => {
+        // ページ読み込み時に即座にBGMを開始
+        fadeIn(boxOpenSound);
+    });
+
     // 紙吹雪の生成
     function createConfetti() {
         const colors = ['#DAA520', '#FF69B4', '#FF1493', '#FFE4E1'];
@@ -41,6 +96,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // メッセージカードのテキスト
+    const messageTexts = [
+        'ありがとう',
+        '感謝',
+        '大好き',
+        'いつも',
+        '笑顔',
+        '最高',
+        'お料理最高！',
+        '優しいね',
+        '見守ってくれて',
+        '尊敬してる',
+        '頼りになる',
+        '相談相手'
+    ];
+
+    // メッセージカードの色
+    const cardColors = [
+        '#ffd1dc', // コーラルピンク
+        '#98fb98', // ミントグリーン
+        '#fffacd'  // クリームイエロー
+    ];
+
+    // メッセージカードを生成
+    function createMessageCard() {
+        const card = document.createElement('div');
+        card.className = `message-card ${Math.random() > 0.5 ? 'heart' : 'star'}`;
+        card.textContent = messageTexts[Math.floor(Math.random() * messageTexts.length)];
+        card.style.backgroundColor = cardColors[Math.floor(Math.random() * cardColors.length)];
+        card.style.left = `${Math.random() * 80 + 10}%`;
+        
+        const messageShower = document.querySelector('.message-shower');
+        messageShower.appendChild(card);
+        
+        // タップイベント
+        card.addEventListener('click', () => {
+            card.style.transform = 'scale(1.2)';
+            card.style.opacity = '0.8';
+            setTimeout(() => {
+                card.remove();
+            }, 2000);
+        });
+        
+        // アニメーション終了後に要素を削除
+        card.addEventListener('animationend', () => {
+            card.remove();
+        });
+    }
+
+    // きらめきを生成
+    function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = `${Math.random() * 100}%`;
+        sparkle.style.top = `${Math.random() * 100}%`;
+        
+        const sparkleContainer = document.querySelector('.sparkle-container');
+        sparkleContainer.appendChild(sparkle);
+        
+        setTimeout(() => {
+            sparkle.remove();
+        }, 1000);
+    }
+
+    // 浮遊する粒子を生成
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        const floatingParticles = document.querySelector('.floating-particles');
+        floatingParticles.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 3000);
+    }
+
+    // メッセージシャワーの開始
+    function startMessageShower() {
+        // メッセージカードの生成を開始
+        setInterval(createMessageCard, 2000);
+        
+        // きらめきの生成を開始
+        setInterval(createSparkle, 300);
+        
+        // 浮遊する粒子の生成を開始
+        setInterval(createParticle, 1000);
+    }
+
     // プレゼントボックスのクリックイベント
     giftBox.addEventListener('click', () => {
         openGiftButton.classList.remove('hidden');
@@ -49,14 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 開けるボタンのクリックイベント
     openGiftButton.addEventListener('click', () => {
-        // 効果音再生
-        boxOpenSound.play();
-        
         // プレゼントボックスを開く
         giftBox.classList.add('open');
         
         // オープニングセクションをフェードアウト
         openingSection.classList.add('fade-out');
+        
+        // 現在のBGM（box_open.mp3）をフェードアウト
+        fadeOut(boxOpenSound, () => {
+            // 新しいBGM（background_music.mp3）をフェードイン
+            fadeIn(bgm);
+        });
         
         setTimeout(() => {
             openingSection.classList.add('hidden');
@@ -66,19 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mainMessageSection.classList.remove('hidden');
             mainMessageSection.classList.add('fade-in');
             
-            // 背景画像をフェードイン
-            const backgroundImage = mainMessageSection.querySelector('.background-image');
-            backgroundImage.style.opacity = '1';
-            
-            // メッセージコンテナを表示
-            const messageContainer = mainMessageSection.querySelector('.message-container');
-            messageContainer.classList.add('show');
-            
-            // シャボン玉を生成
-            createBubbles();
-            
-            // BGM再生開始
-            bgm.play();
+            // メッセージシャワーを開始
+            startMessageShower();
         }, 1000);
     });
 
@@ -199,14 +337,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // BGMコントロール
-    bgmToggle.addEventListener('click', () => {
-        if (bgm.paused) {
-            bgm.play();
-            bgmToggle.querySelector('.music-note').textContent = '♪';
+    const bgmControl = document.querySelector('.bgm-control');
+    let isPlaying = true;
+
+    bgmControl.addEventListener('click', () => {
+        if (isPlaying) {
+            // 現在再生中のBGMをフェードアウト
+            if (giftBox.classList.contains('open')) {
+                fadeOut(bgm);
+            } else {
+                fadeOut(boxOpenSound);
+            }
+            bgmControl.textContent = '♪';
         } else {
-            bgm.pause();
-            bgmToggle.querySelector('.music-note').textContent = '♫';
+            // 現在の状態に応じて適切なBGMをフェードイン
+            if (giftBox.classList.contains('open')) {
+                fadeIn(bgm);
+            } else {
+                fadeIn(boxOpenSound);
+            }
+            bgmControl.textContent = '♫';
         }
+        isPlaying = !isPlaying;
     });
 
     // 隠しメッセージ
