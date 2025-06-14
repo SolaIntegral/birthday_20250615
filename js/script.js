@@ -20,25 +20,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // フェードイン関数
     function fadeIn(audio, callback) {
+        // 音声を確実に再生
+        audio.currentTime = 0;
         audio.volume = 0;
-        audio.play();
+        const playPromise = audio.play();
         
-        let startTime = null;
-        function fadeInStep(timestamp) {
-            if (!startTime) startTime = timestamp;
-            const progress = timestamp - startTime;
-            const volume = Math.min(progress / FADE_DURATION, 1);
-            
-            audio.volume = volume;
-            
-            if (progress < FADE_DURATION) {
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                let startTime = null;
+                function fadeInStep(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = timestamp - startTime;
+                    const volume = Math.min(progress / FADE_DURATION, 1);
+                    
+                    audio.volume = volume;
+                    
+                    if (progress < FADE_DURATION) {
+                        requestAnimationFrame(fadeInStep);
+                    } else if (callback) {
+                        callback();
+                    }
+                }
+                
                 requestAnimationFrame(fadeInStep);
-            } else if (callback) {
-                callback();
-            }
+            }).catch(error => {
+                console.error('音声の再生に失敗しました:', error);
+            });
         }
-        
-        requestAnimationFrame(fadeInStep);
     }
 
     // フェードアウト関数
@@ -65,9 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 初期BGMのフェードイン（box_open.mp3）
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         // ページ読み込み時に即座にBGMを開始
-        fadeIn(boxOpenSound);
+        console.log('BGM開始');
+        fadeIn(bgm);
     });
 
     // 紙吹雪の生成
@@ -189,12 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // プレゼントボックスのクリックイベント
     giftBox.addEventListener('click', () => {
-        openGiftButton.classList.remove('hidden');
-        giftBox.style.cursor = 'pointer';
-    });
-
-    // 開けるボタンのクリックイベント
-    openGiftButton.addEventListener('click', () => {
+        console.log('プレゼントボックスをクリック');
         // プレゼントボックスを開く
         giftBox.classList.add('open');
         
@@ -202,9 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
         openingSection.classList.add('fade-out');
         
         // 現在のBGM（box_open.mp3）をフェードアウト
-        fadeOut(boxOpenSound, () => {
+        fadeOut(bgm, () => {
+            console.log('BGM切り替え');
             // 新しいBGM（background_music.mp3）をフェードイン
-            fadeIn(bgm);
+            fadeIn(boxOpenSound);
         });
         
         setTimeout(() => {
@@ -344,17 +349,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isPlaying) {
             // 現在再生中のBGMをフェードアウト
             if (giftBox.classList.contains('open')) {
-                fadeOut(bgm);
-            } else {
                 fadeOut(boxOpenSound);
+            } else {
+                fadeOut(bgm);
             }
             bgmControl.textContent = '♪';
         } else {
             // 現在の状態に応じて適切なBGMをフェードイン
             if (giftBox.classList.contains('open')) {
-                fadeIn(bgm);
-            } else {
                 fadeIn(boxOpenSound);
+            } else {
+                fadeIn(bgm);
             }
             bgmControl.textContent = '♫';
         }

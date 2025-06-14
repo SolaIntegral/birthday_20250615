@@ -71,22 +71,19 @@ body {
 }
 
 .gift-box {
-    width: 300px;
-    height: auto;
+    width: 200px;
+    height: 200px;
     cursor: pointer;
-    transition: all 0.5s ease;
-    transform-style: preserve-3d;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
 }
 
 .gift-box:hover {
-    transform: scale(1.1) rotate(5deg);
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+    transform: scale(1.05);
 }
 
 .gift-box.open {
-    transform: scale(1.2) rotateY(180deg);
-    opacity: 0;
+    transform: scale(1.2) rotate(360deg);
+    transition: transform 1s ease;
 }
 
 .gift-box-top {
