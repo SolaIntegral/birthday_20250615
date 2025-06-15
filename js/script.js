@@ -247,7 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastSlide.classList.add('slide-up');
                 
                 setTimeout(() => {
-                    window.location.href = 'album.html';
+                    // BGMをフェードアウト
+                    fadeOut(bgm, () => {
+                        window.location.href = 'album.html';
+                    });
                 }, 1000);
                 return;
             }
@@ -288,7 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastSlide.classList.add('slide-up');
                 
                 setTimeout(() => {
-                    window.location.href = 'album.html';
+                    // BGMをフェードアウト
+                    fadeOut(bgm, () => {
+                        window.location.href = 'album.html';
+                    });
                 }, 1000);
                 isDragging = false;
                 return;

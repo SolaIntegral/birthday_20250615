@@ -4,6 +4,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const photoGallery = document.getElementById('photo-gallery');
     const nextButton = document.querySelector('.next-button');
     
+    // BGMのフェードイン再生（最初のユーザー操作で）
+    const bgm = document.getElementById('bgm');
+    let bgmStarted = false;
+    function fadeIn(audio, callback) {
+        audio.currentTime = 0;
+        audio.volume = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                let startTime = null;
+                function fadeInStep(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    const progress = timestamp - startTime;
+                    const volume = Math.min(progress / 1000, 1);
+                    audio.volume = volume;
+                    if (progress < 1000) {
+                        requestAnimationFrame(fadeInStep);
+                    } else if (callback) {
+                        callback();
+                    }
+                }
+                requestAnimationFrame(fadeInStep);
+            }).catch(() => {});
+        }
+    }
+    function startBgmIfNeeded() {
+        if (!bgmStarted) {
+            fadeIn(bgm);
+            bgmStarted = true;
+        }
+    }
+    document.addEventListener('click', startBgmIfNeeded, { once: true });
+    document.addEventListener('touchstart', startBgmIfNeeded, { once: true });
+    
     // パーティクルエフェクトの初期化
     initParticles();
     
