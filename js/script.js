@@ -68,11 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 拡大アニメーション
         giftBox.style.transition = 'transform 1.5s cubic-bezier(.68,-0.55,.27,1.55), opacity 1.2s';
         giftBox.style.transform = 'scale(1.35)';
-        // ヒント表示
-        // tapHint.textContent = '↓TAP HERE↓';
-        // tapHint.style.opacity = 1;
-        // tapHint.style.animation = 'blink 0.5s steps(1, end) infinite';
-        // tapHint.style.fontFamily = 'Kalam, cursive';
         // フッターをフェードアウト
         footerText.style.animation = 'none';
         footerText.style.transition = 'opacity 0.7s';
@@ -85,18 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // 光エフェクト
         lightEffect.classList.add('active');
-        // 紙吹雪
-        // setTimeout(() => {
-        //   for (let i = 0; i < 48; i++) {
-        //     const confetti = document.createElement('div');
-        //     confetti.className = 'confetti';
-        //     confetti.style.left = Math.random() * 100 + 'vw';
-        //     confetti.style.background = `hsl(${Math.random()*360},80%,70%)`;
-        //     confetti.style.animationDelay = (Math.random()*0.7) + 's';
-        //     confettiContainer.appendChild(confetti);
-        //     setTimeout(() => confetti.remove(), 2000);
-        //   }
-        // }, 300);
+        // BGM再生（フェードイン）
+        fadeIn(bgm);
         // 画面遷移
         setTimeout(() => {
             openingSection.style.opacity = 0;

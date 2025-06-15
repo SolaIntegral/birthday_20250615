@@ -5,32 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>お誕生日おめでとう！</title>
     <link rel="stylesheet" href="css/album.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Indie+Flower&family=Montserrat:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="album-container">
-        <h1 class="album-title">お誕生日おめでとう！</h1>
-        <div class="photo-grid">
-            <div class="photo-item"><img src="images/m1.jpg" alt="思い出1"></div>
-            <div class="photo-item"><img src="images/m2.jpg" alt="思い出2"></div>
-            <div class="photo-item"><img src="images/m3.jpg" alt="思い出3"></div>
-            <div class="photo-item"><img src="images/m4.jpg" alt="思い出4"></div>
-            <div class="photo-item"><img src="images/m5.jpg" alt="思い出5"></div>
-            <div class="photo-item"><img src="images/m6.jpg" alt="思い出6"></div>
-            <div class="photo-item"><img src="images/m7.jpg" alt="思い出7"></div>
-            <div class="photo-item"><img src="images/m8.jpg" alt="思い出8"></div>
-            <div class="photo-item"><img src="images/m9.jpg" alt="思い出9"></div>
-            <div class="photo-item"><img src="images/m10.jpg" alt="思い出10"></div>
-            <div class="photo-item"><img src="images/m11.jpg" alt="思い出11"></div>
-            <div class="photo-item"><img src="images/m12.jpg" alt="思い出12"></div>
-            <div class="photo-item"><img src="images/m13.jpg" alt="思い出13"></div>
-            <div class="photo-item"><img src="images/m14.jpg" alt="思い出14"></div>
-            <div class="photo-item"><img src="images/m15.jpg" alt="思い出15"></div>
-            <div class="photo-item"><img src="images/m16.jpg" alt="思い出16"></div>
-            <div class="photo-item"><img src="images/m17.jpg" alt="思い出17"></div>
-            <div class="photo-item"><img src="images/m18.jpg" alt="思い出18"></div>
-            <div class="photo-item"><img src="images/m19.jpg" alt="思い出19"></div>
+    <!-- 導入メッセージページ -->
+    <section id="intro-message" class="active">
+        <div class="message-container">
+            <h1 class="main-message">Happy Birthday, Mom!</h1>
+            <p class="sub-message">Thank you for everything.</p>
+            <p class="memory-message">Every memory with you shines brighter than the stars.<br>We love you always!</p>
+            <div class="next-button">
+                <span>Tap to explore memories</span>
+                <span class="arrow">→</span>
+            </div>
         </div>
-    </div>
+        <div class="particles"></div>
+    </section>
+
+    <!-- 思い出写真ギャラリー -->
+    <section id="photo-gallery" class="hidden">
+        <div class="gallery-container">
+            <div class="carousel-track">
+                <div class="carousel-item" data-message="Our first family trip to the beach"><img src="images/m1.jpg" alt="思い出1"></div>
+                <div class="carousel-item" data-message="That special Christmas morning"><img src="images/m2.jpg" alt="思い出2"></div>
+                <div class="carousel-item" data-message="Our favorite family dinner"><img src="images/m3.jpg" alt="思い出3"></div>
+                <div class="carousel-item" data-message="The day we went to the park"><img src="images/m4.jpg" alt="思い出4"></div>
+                <div class="carousel-item" data-message="Our summer vacation"><img src="images/m5.jpg" alt="思い出5"></div>
+                <div class="carousel-item" data-message="The family reunion"><img src="images/m6.jpg" alt="思い出6"></div>
+                <div class="carousel-item" data-message="Our weekend getaway"><img src="images/m7.JPG" alt="思い出7"></div>
+                <div class="carousel-item" data-message="The birthday celebration"><img src="images/m8.JPG" alt="思い出8"></div>
+                <div class="carousel-item" data-message="Our garden party"><img src="images/m9.JPG" alt="思い出9"></div>
+                <div class="carousel-item" data-message="The family picnic"><img src="images/m10.JPG" alt="思い出10"></div>
+                <div class="carousel-item" data-message="Our holiday gathering"><img src="images/m11.JPG" alt="思い出11"></div>
+                <div class="carousel-item" data-message="The family dinner"><img src="images/m12.JPG" alt="思い出12"></div>
+                <div class="carousel-item" data-message="Our weekend brunch"><img src="images/m13.JPG" alt="思い出13"></div>
+                <div class="carousel-item" data-message="The family celebration"><img src="images/m14.JPG" alt="思い出14"></div>
+                <div class="carousel-item" data-message="Our special moment"><img src="images/m15.jpg" alt="思い出15"></div>
+                <div class="carousel-item" data-message="The family gathering"><img src="images/m16.jpg" alt="思い出16"></div>
+                <div class="carousel-item" data-message="Our memorable day"><img src="images/m17.jpg" alt="思い出17"></div>
+                <div class="carousel-item" data-message="The family reunion"><img src="images/m18.jpg" alt="思い出18"></div>
+                <div class="carousel-item" data-message="Our precious moment"><img src="images/m19.jpg" alt="思い出19"></div>
+            </div>
+        </div>
+        <div class="lightbox hidden">
+            <div class="lightbox-content">
+                <img src="" alt="拡大写真">
+                <p class="photo-message"></p>
+                <button class="close-button">×</button>
+            </div>
+        </div>
+        <div class="magic-trail"></div>
+    </section>
+
+    <!-- 隠しメッセージ -->
+    <div class="hidden-message" style="top: 20%; left: 10%;">We love you, Mom!</div>
+    <div class="hidden-message" style="top: 60%; right: 15%;">You're the best!</div>
+    <div class="hidden-message" style="bottom: 20%; left: 30%;">Thank you for everything!</div>
+
     <script src="js/album.js"></script>
 </body>
 </html> 
