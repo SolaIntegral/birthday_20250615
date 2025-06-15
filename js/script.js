@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const giftBox = document.getElementById('gift-box');
     const lightEffect = document.getElementById('light-effect');
     const footerText = document.querySelector('.footer-text');
-    const bouquet = document.getElementById('bouquet');
 
     // 存在チェックからgiftBoxを除外
     if (!giftBox || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect || !footerText) {
@@ -114,107 +113,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { once: true });
 
     // スクラッチカバー
-    const scratchCovers = [
-        document.getElementById('scratch-cover-1'),
-        document.getElementById('scratch-cover-2'),
-        document.getElementById('scratch-cover-3')
-    ];
-    const coverImages = [
-        'images/cover1.png',
-        'images/cover2.png',
-        'images/cover3.png'
-    ];
-    let currentLayer = 0;
-    const ctxs = [];
-
-    function initScratchLayers() {
-        scratchCovers.forEach((cover, index) => {
-            if (!cover) return;
-            
-            const ctx = cover.getContext('2d');
-            ctxs.push(ctx);
-            
-            // 最初のレイヤー以外は非表示
-            if (index > 0) {
-                cover.style.display = 'none';
-                cover.style.opacity = '0';
-            }
-            
-            // 画像を読み込む
-            const img = new Image();
-            img.src = coverImages[index];
-            
-            img.onload = function() {
-                resizeScratch(cover, ctx, img);
-            }
-        });
-    }
-
-    function resizeScratch(cover, ctx, img) {
-        cover.width = window.innerWidth;
-        cover.height = window.innerHeight;
-        ctx.drawImage(img, 0, 0, cover.width, cover.height);
-    }
-
-    function scratch(x, y) {
-        if (currentLayer >= scratchCovers.length) return;
-        
-        const ctx = ctxs[currentLayer];
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, 32, 0, Math.PI * 2);
-        ctx.fill();
-        checkScratchClear();
-    }
-
-    function checkScratchClear() {
-        if (currentLayer >= scratchCovers.length) return;
-        
-        const ctx = ctxs[currentLayer];
-        const cover = scratchCovers[currentLayer];
-        const imageData = ctx.getImageData(0, 0, cover.width, cover.height);
-        let clearPixels = 0;
-        
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            if (imageData.data[i + 3] < 128) clearPixels++;
-        }
-        
-        if (clearPixels > imageData.data.length * 0.6) {
-            cover.style.transition = 'opacity 0.7s';
-            cover.style.opacity = '0';
-            
-            setTimeout(() => {
-                cover.style.display = 'none';
-                currentLayer++;
-                
-                if (currentLayer < scratchCovers.length) {
-                    // 次のレイヤーを表示
-                    const nextCover = scratchCovers[currentLayer];
-                    nextCover.style.display = 'block';
-                    nextCover.style.opacity = '1';
-                    
-                    // 次のレイヤーのコンテキストをリセット
-                    const nextCtx = ctxs[currentLayer];
-                    const nextImg = new Image();
-                    nextImg.src = coverImages[currentLayer];
-                    nextImg.onload = function() {
-                        resizeScratch(nextCover, nextCtx, nextImg);
-                    }
-                } else {
-                    // すべてのレイヤーが削られた
-                    if (bouquet) bouquet.classList.add('show');
-                }
-            }, 800);
-        }
-    }
-
-    // イベントリスナーの設定
-    scratchCovers.forEach(cover => {
-        if (!cover) return;
-        
+    const scratchCover = document.getElementById('scratch-cover');
+    const bouquet = document.getElementById('bouquet');
+    if (scratchCover) {
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
+        let scratched = 0;
+        const ctx = scratchCover.getContext('2d');
+
+        function resizeScratch() {
+            scratchCover.width = window.innerWidth;
+            scratchCover.height = window.innerHeight;
+            
+            // 画像を読み込む
+            const img = new Image();
+            img.src = 'images/cover1.png';
+            
+            img.onload = function() {
+                // 画像を描画
+                ctx.drawImage(img, 0, 0, scratchCover.width, scratchCover.height);
+            }
+        }
+
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 32, 0, Math.PI * 2);
+            ctx.fill();
+            scratched++;
+        }
 
         function getXY(e) {
             if (e.touches && e.touches.length > 0) {
@@ -224,49 +152,139 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        cover.addEventListener('mousedown', e => {
+        scratchCover.addEventListener('mousedown', e => {
             isDrawing = true;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        
-        cover.addEventListener('mousemove', e => {
+        scratchCover.addEventListener('mousemove', e => {
             if (!isDrawing) return;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        
-        cover.addEventListener('mouseup', () => isDrawing = false);
-        cover.addEventListener('mouseleave', () => isDrawing = false);
+        scratchCover.addEventListener('mouseup', () => isDrawing = false);
+        scratchCover.addEventListener('mouseleave', () => isDrawing = false);
 
-        cover.addEventListener('touchstart', e => {
+        scratchCover.addEventListener('touchstart', e => {
             isDrawing = true;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        
-        cover.addEventListener('touchmove', e => {
+        scratchCover.addEventListener('touchmove', e => {
             if (!isDrawing) return;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        
-        cover.addEventListener('touchend', () => isDrawing = false);
-    });
+        scratchCover.addEventListener('touchend', () => isDrawing = false);
 
-    window.addEventListener('resize', () => {
-        scratchCovers.forEach((cover, index) => {
-            if (!cover) return;
-            const img = new Image();
-            img.src = coverImages[index];
-            img.onload = function() {
-                resizeScratch(cover, ctxs[index], img);
+        window.addEventListener('resize', resizeScratch);
+        resizeScratch();
+
+        // 一定以上削ったらカバーを消す
+        function checkScratchClear() {
+            const imageData = ctx.getImageData(0, 0, scratchCover.width, scratchCover.height);
+            let clearPixels = 0;
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                if (imageData.data[i + 3] < 128) clearPixels++;
+            }
+            if (clearPixels > imageData.data.length / 8) {
+                scratchCover.style.transition = 'opacity 0.7s';
+                scratchCover.style.opacity = 0;
+                setTimeout(() => {
+                    scratchCover.style.display = 'none';
+                    // 最初のスライドを表示
+                    const firstSlide = document.querySelector('.slide-image');
+                    if (firstSlide) {
+                        firstSlide.classList.add('active');
+                    }
+                }, 800);
+            }
+        }
+        scratchCover.addEventListener('mousemove', checkScratchClear);
+        scratchCover.addEventListener('touchmove', checkScratchClear);
+
+        // スライド切り替えの処理
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide-image');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                    slide.classList.remove('next', 'prev');
+                } else if (i < index) {
+                    slide.classList.remove('active');
+                    slide.classList.add('prev');
+                    slide.classList.remove('next');
+                } else {
+                    slide.classList.remove('active');
+                    slide.classList.add('next');
+                    slide.classList.remove('prev');
+                }
+            });
+        }
+
+        // スワイプ検出
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        messageSection.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        messageSection.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && currentSlide < totalSlides - 1) {
+                    // 左スワイプ
+                    currentSlide++;
+                } else if (diff < 0 && currentSlide > 0) {
+                    // 右スワイプ
+                    currentSlide--;
+                }
+                showSlide(currentSlide);
+            }
+        }
+
+        // マウスでのドラッグもサポート
+        let isDragging = false;
+        let startX = 0;
+
+        messageSection.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+        });
+
+        messageSection.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const diff = startX - e.clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                } else if (diff < 0 && currentSlide > 0) {
+                    currentSlide--;
+                }
+                showSlide(currentSlide);
+                isDragging = false;
             }
         });
-    });
 
-    // 初期化
-    initScratchLayers();
+        messageSection.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        messageSection.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+    }
 
     // アルバムセクション
     const albumPages = document.querySelectorAll('.album-page');
@@ -316,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         albumSection.style.display = 'none';
         
         // スクラッチカバーの初期化
-        initScratchLayers();
+        resizeScratch();
         
         // アルバムの初期ページ表示
         showPage(0);

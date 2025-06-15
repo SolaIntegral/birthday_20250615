@@ -25,45 +25,15 @@
     <!-- フェーズ2：メッセージ表示 -->
     <section id="message-section" class="hidden">
         <div class="message-bg">
-            <img src="images/flower-bg.png" alt="背景の花" class="bg-flower">
-            <img src="images/memory1.jpg" alt="思い出" class="bg-memory">
+            <div class="slide-container">
+                <img src="images/cover2.png" alt="カバー2" class="slide-image">
+                <img src="images/cover3.png" alt="カバー3" class="slide-image">
+                <img src="images/cover4.png" alt="カバー4" class="slide-image">
+            </div>
         </div>
         <canvas id="bubble-canvas"></canvas>
-        <img src="images/flower-bouquet.png" alt="花束" id="bouquet" class="bouquet hidden">
         <div class="message-container">
-            <div class="main-message">
-                <h1>お母さん、お誕生日おめでとう！</h1>
-                <p>いつも本当にありがとう。<br>これからも元気でいてね。</p>
-            </div>
-            <!-- 複数のスクラッチレイヤー -->
-            <div class="scratch-layers">
-                <canvas id="scratch-cover-1" class="scratch-cover"></canvas>
-                <canvas id="scratch-cover-2" class="scratch-cover"></canvas>
-                <canvas id="scratch-cover-3" class="scratch-cover"></canvas>
-            </div>
-        </div>
-    </section>
-
-    <!-- フェーズ3：アルバム -->
-    <section id="album-section" class="hidden">
-        <div class="album-container">
-            <div class="album-cover">
-                <img src="images/album_cover.jpg" alt="Album Cover">
-            </div>
-            <div class="album-pages">
-                <div class="album-page">
-                    <div class="family-message">
-                        <img src="images/family_member_photo_1.jpg" alt="Family Photo">
-                        <p>Thank you for being the best mom in the world!</p>
-                    </div>
-                </div>
-                <div class="album-page">
-                    <div class="memory-photo">
-                        <img src="images/mothers_smile_photo.jpg" alt="Mother's Smile">
-                        <p>Your smile brightens our day!</p>
-                    </div>
-                </div>
-            </div>
+            <canvas id="scratch-cover" class="scratch-cover"></canvas>
         </div>
     </section>
 
