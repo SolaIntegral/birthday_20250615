@@ -12,9 +12,11 @@
     <section id="opening-section">
         <div class="starry-background"></div>
         <div class="gift-box-container">
-            <img src="images/gift-box-bottom.png" alt="Gift Box Bottom" id="gift-box-bottom" class="gift-box-bottom">
-            <img src="images/gift-box-top.png" alt="Gift Box Top" id="gift-box-top" class="gift-box-top">
-            <div class="tap-hint">↓TAP HERE↓</div>
+            <div class="box-glow"></div>
+            <img src="images/gift-box.png" alt="プレゼントボックス" id="gift-box" class="gift-box">
+            <!-- <div id="tap-hint" class="tap-hint">タップして開けてね</div> -->
+            <div id="floating-stars" class="floating-stars"></div>
+            <div class="sparkle-container"></div>
         </div>
         <div class="light-effect" id="light-effect"></div>
         <div class="footer-text">Surprise is waiting!</div>
@@ -33,7 +35,12 @@
                 <h1>お母さん、お誕生日おめでとう！</h1>
                 <p>いつも本当にありがとう。<br>これからも元気でいてね。</p>
             </div>
-            <canvas id="scratch-cover" class="scratch-cover"></canvas>
+            <!-- 複数のスクラッチレイヤー -->
+            <div class="scratch-layers">
+                <canvas id="scratch-cover-1" class="scratch-cover"></canvas>
+                <canvas id="scratch-cover-2" class="scratch-cover"></canvas>
+                <canvas id="scratch-cover-3" class="scratch-cover"></canvas>
+            </div>
         </div>
     </section>
 

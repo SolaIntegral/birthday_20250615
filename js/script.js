@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const navButtons = document.querySelectorAll('.nav-button');
     const cloverIcon = document.querySelector('.clover-icon');
     const confettiContainer = document.querySelector('.confetti-container');
-    const giftBoxTop = document.getElementById('gift-box-top');
+    const giftBox = document.getElementById('gift-box');
     const lightEffect = document.getElementById('light-effect');
+    const footerText = document.querySelector('.footer-text');
+    const bouquet = document.getElementById('bouquet');
 
     // 存在チェックからgiftBoxを除外
-    if (!giftBoxTop || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect) {
+    if (!giftBox || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect || !footerText) {
         console.warn('一部の要素が見つかりません。');
         return;
     }
@@ -44,30 +46,61 @@ document.addEventListener('DOMContentLoaded', () => {
         isBgmPlaying = !isBgmPlaying;
     });
 
-    // オープニング演出
-    if (openingSection && giftBoxTop && lightEffect && confettiContainer) {
-        openingSection.addEventListener('click', () => {
-            if (isBoxOpened) return;
-            isBoxOpened = true;
-            // 1. 蓋を持ち上げる
-            giftBoxTop.classList.add('lift');
-            // 2. 光バースト
-            setTimeout(() => {
-                lightEffect.classList.add('active');
-            }, 900);
-            // 3. 紙吹雪
-            setTimeout(() => {
-                for (let i = 0; i < 48; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.background = `hsl(${Math.random()*360},80%,70%)`;
-                    confetti.style.animationDelay = (Math.random()*0.7) + 's';
-                    confettiContainer.appendChild(confetti);
-                    setTimeout(() => confetti.remove(), 2000);
-                }
-            }, 1200);
-            // 4. 次の画面へ遷移
+    // 星生成（数・ランダム性増強）
+    function createStars() {
+        if (!floatingStars) return;
+        floatingStars.innerHTML = '';
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            floatingStars.appendChild(star);
+        }
+    }
+    createStars();
+
+    // openingSectionクリックで全演出を実行
+    openingSection.addEventListener('click', () => {
+        if (isBoxOpened) return;
+        isBoxOpened = true;
+        giftBox.classList.remove('heartbeat');
+        // 拡大アニメーション
+        giftBox.style.transition = 'transform 1.5s cubic-bezier(.68,-0.55,.27,1.55), opacity 1.2s';
+        giftBox.style.transform = 'scale(1.35)';
+        // ヒント表示
+        // tapHint.textContent = '↓TAP HERE↓';
+        // tapHint.style.opacity = 1;
+        // tapHint.style.animation = 'blink 0.5s steps(1, end) infinite';
+        // tapHint.style.fontFamily = 'Kalam, cursive';
+        // フッターをフェードアウト
+        footerText.style.animation = 'none';
+        footerText.style.transition = 'opacity 0.7s';
+        footerText.style.opacity = 0;
+        // 星を減らす
+        if (floatingStars) {
+            Array.from(floatingStars.children).forEach((star, i) => {
+                if (i % 2 === 0) star.style.opacity = 0.2;
+            });
+        }
+        // 光エフェクト
+        lightEffect.classList.add('active');
+        // 紙吹雪
+        // setTimeout(() => {
+        //   for (let i = 0; i < 48; i++) {
+        //     const confetti = document.createElement('div');
+        //     confetti.className = 'confetti';
+        //     confetti.style.left = Math.random() * 100 + 'vw';
+        //     confetti.style.background = `hsl(${Math.random()*360},80%,70%)`;
+        //     confetti.style.animationDelay = (Math.random()*0.7) + 's';
+        //     confettiContainer.appendChild(confetti);
+        //     setTimeout(() => confetti.remove(), 2000);
+        //   }
+        // }, 300);
+        // 画面遷移
+        setTimeout(() => {
+            openingSection.style.opacity = 0;
             setTimeout(() => {
                 openingSection.style.display = 'none';
                 const messageSection = document.getElementById('message-section');
@@ -76,34 +109,112 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageSection.style.display = 'flex';
                     messageSection.classList.add('fade-in');
                 }
-            }, 2000);
+            }, 700);
+        }, 700);
+    }, { once: true });
+
+    // スクラッチカバー
+    const scratchCovers = [
+        document.getElementById('scratch-cover-1'),
+        document.getElementById('scratch-cover-2'),
+        document.getElementById('scratch-cover-3')
+    ];
+    const coverImages = [
+        'images/cover1.png',
+        'images/cover2.png',
+        'images/cover3.png'
+    ];
+    let currentLayer = 0;
+    const ctxs = [];
+
+    function initScratchLayers() {
+        scratchCovers.forEach((cover, index) => {
+            if (!cover) return;
+            
+            const ctx = cover.getContext('2d');
+            ctxs.push(ctx);
+            
+            // 最初のレイヤー以外は非表示
+            if (index > 0) {
+                cover.style.display = 'none';
+                cover.style.opacity = '0';
+            }
+            
+            // 画像を読み込む
+            const img = new Image();
+            img.src = coverImages[index];
+            
+            img.onload = function() {
+                resizeScratch(cover, ctx, img);
+            }
         });
     }
 
-    // スクラッチカバー
-    const scratchCover = document.getElementById('scratch-cover');
-    const bouquet = document.getElementById('bouquet');
-    if (scratchCover) {
+    function resizeScratch(cover, ctx, img) {
+        cover.width = window.innerWidth;
+        cover.height = window.innerHeight;
+        ctx.drawImage(img, 0, 0, cover.width, cover.height);
+    }
+
+    function scratch(x, y) {
+        if (currentLayer >= scratchCovers.length) return;
+        
+        const ctx = ctxs[currentLayer];
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 32, 0, Math.PI * 2);
+        ctx.fill();
+        checkScratchClear();
+    }
+
+    function checkScratchClear() {
+        if (currentLayer >= scratchCovers.length) return;
+        
+        const ctx = ctxs[currentLayer];
+        const cover = scratchCovers[currentLayer];
+        const imageData = ctx.getImageData(0, 0, cover.width, cover.height);
+        let clearPixels = 0;
+        
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            if (imageData.data[i + 3] < 128) clearPixels++;
+        }
+        
+        if (clearPixels > imageData.data.length * 0.6) {
+            cover.style.transition = 'opacity 0.7s';
+            cover.style.opacity = '0';
+            
+            setTimeout(() => {
+                cover.style.display = 'none';
+                currentLayer++;
+                
+                if (currentLayer < scratchCovers.length) {
+                    // 次のレイヤーを表示
+                    const nextCover = scratchCovers[currentLayer];
+                    nextCover.style.display = 'block';
+                    nextCover.style.opacity = '1';
+                    
+                    // 次のレイヤーのコンテキストをリセット
+                    const nextCtx = ctxs[currentLayer];
+                    const nextImg = new Image();
+                    nextImg.src = coverImages[currentLayer];
+                    nextImg.onload = function() {
+                        resizeScratch(nextCover, nextCtx, nextImg);
+                    }
+                } else {
+                    // すべてのレイヤーが削られた
+                    if (bouquet) bouquet.classList.add('show');
+                }
+            }, 800);
+        }
+    }
+
+    // イベントリスナーの設定
+    scratchCovers.forEach(cover => {
+        if (!cover) return;
+        
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
-        let scratched = 0;
-        const ctx = scratchCover.getContext('2d');
-
-        function resizeScratch() {
-            scratchCover.width = window.innerWidth;
-            scratchCover.height = window.innerHeight;
-            ctx.fillStyle = 'rgba(255,255,255,0.92)';
-            ctx.fillRect(0, 0, scratchCover.width, scratchCover.height);
-        }
-
-        function scratch(x, y) {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.arc(x, y, 32, 0, Math.PI * 2);
-            ctx.fill();
-            scratched++;
-        }
 
         function getXY(e) {
             if (e.touches && e.touches.length > 0) {
@@ -113,54 +224,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        scratchCover.addEventListener('mousedown', e => {
+        cover.addEventListener('mousedown', e => {
             isDrawing = true;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        scratchCover.addEventListener('mousemove', e => {
+        
+        cover.addEventListener('mousemove', e => {
             if (!isDrawing) return;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        scratchCover.addEventListener('mouseup', () => isDrawing = false);
-        scratchCover.addEventListener('mouseleave', () => isDrawing = false);
+        
+        cover.addEventListener('mouseup', () => isDrawing = false);
+        cover.addEventListener('mouseleave', () => isDrawing = false);
 
-        scratchCover.addEventListener('touchstart', e => {
+        cover.addEventListener('touchstart', e => {
             isDrawing = true;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        scratchCover.addEventListener('touchmove', e => {
+        
+        cover.addEventListener('touchmove', e => {
             if (!isDrawing) return;
             const [x, y] = getXY(e);
             scratch(x, y);
         });
-        scratchCover.addEventListener('touchend', () => isDrawing = false);
+        
+        cover.addEventListener('touchend', () => isDrawing = false);
+    });
 
-        window.addEventListener('resize', resizeScratch);
-        resizeScratch();
+    window.addEventListener('resize', () => {
+        scratchCovers.forEach((cover, index) => {
+            if (!cover) return;
+            const img = new Image();
+            img.src = coverImages[index];
+            img.onload = function() {
+                resizeScratch(cover, ctxs[index], img);
+            }
+        });
+    });
 
-        // 一定以上削ったらカバーを消す
-        function checkScratchClear() {
-            const imageData = ctx.getImageData(0, 0, scratchCover.width, scratchCover.height);
-            let clearPixels = 0;
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                if (imageData.data[i + 3] < 128) clearPixels++;
-            }
-            if (clearPixels > imageData.data.length / 8) {
-                scratchCover.style.transition = 'opacity 0.7s';
-                scratchCover.style.opacity = 0;
-                setTimeout(() => {
-                    scratchCover.style.display = 'none';
-                    // 花束アニメーション
-                    if (bouquet) bouquet.classList.add('show');
-                }, 800);
-            }
-        }
-        scratchCover.addEventListener('mousemove', checkScratchClear);
-        scratchCover.addEventListener('touchmove', checkScratchClear);
-    }
+    // 初期化
+    initScratchLayers();
 
     // アルバムセクション
     const albumPages = document.querySelectorAll('.album-page');
@@ -210,32 +316,10 @@ document.addEventListener('DOMContentLoaded', () => {
         albumSection.style.display = 'none';
         
         // スクラッチカバーの初期化
-        resizeScratch();
+        initScratchLayers();
         
         // アルバムの初期ページ表示
         showPage(0);
-    }
-
-    // 初期化の実行
-    init();
-
-    // 星の生成
-    function createStars() {
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.top = `${Math.random() * 100}%`;
-            star.style.animationDelay = `${Math.random() * 2}s`;
-            floatingStars.appendChild(star);
-        }
-    }
-
-    // 初期化
-    function init() {
-        // 要素の初期状態設定
-        messageSection.style.display = 'none';
-        albumSection.style.display = 'none';
     }
 
     // 初期化の実行
@@ -603,9 +687,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     });
 
-    // 初期化
-    createConfetti();
-
     // 花びら・光の粒インタラクション
     if (messageSection) {
         function spawnParticle(x, y) {
@@ -629,5 +710,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 spawnParticle(t.clientX, t.clientY);
             }
         });
+    }
+
+    // スパークル演出
+    const sparkleContainer = document.querySelector('.sparkle-container');
+    if (sparkleContainer) {
+        setInterval(() => {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            // ボックス周囲のランダムな位置
+            const angle = Math.random() * 2 * Math.PI;
+            const radius = 90 + Math.random() * 30;
+            const centerX = 90, centerY = 90;
+            sparkle.style.left = `${centerX + Math.cos(angle) * radius}px`;
+            sparkle.style.top = `${centerY + Math.sin(angle) * radius}px`;
+            sparkleContainer.appendChild(sparkle);
+            setTimeout(() => sparkle.remove(), 1200);
+        }, 1000);
     }
 }); 
