@@ -44,15 +44,21 @@ body {
     justify-content: center;
     align-items: center;
     perspective: 1000px;
+    z-index: 10;
 }
 
 .gift-box {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    transition: transform 1.5s ease;
+    transition: transform 0.3s ease;
     animation: float 3s ease-in-out infinite;
     transform-style: preserve-3d;
+    z-index: 1;
+}
+
+.gift-box:hover {
+    transform: scale(1.05);
 }
 
 .gift-box-top {
@@ -62,10 +68,10 @@ body {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    transition: transform 0.8s ease;
     transform-origin: bottom;
     transform-style: preserve-3d;
     opacity: 0;
+    z-index: 2;
 }
 
 .gift-box-top.open {
@@ -80,6 +86,7 @@ body {
     font-size: 1.2rem;
     opacity: 0;
     animation: blink 1.5s ease-in-out infinite;
+    z-index: 3;
 }
 
 .floating-stars {
@@ -118,6 +125,7 @@ body {
     background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
     opacity: 0;
     pointer-events: none;
+    z-index: 1;
 }
 
 .light-effect.active {
@@ -149,29 +157,99 @@ body {
 
 .scratch-cover {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    background: transparent;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.message-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.bg-flower {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.18;
+    z-index: 1;
+}
+
+.bg-memory {
+    position: absolute;
+    bottom: 0; right: 0; width: 40vw; height: auto;
+    opacity: 0.10;
+    z-index: 2;
     pointer-events: none;
 }
 
-.main-message {
+#bubble-canvas {
     position: absolute;
-    top: 50%;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.bouquet {
+    position: absolute;
+    top: -200px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    transform: translateX(-50%);
+    width: 180px;
+    z-index: 4;
     opacity: 0;
+    transition: top 1.2s cubic-bezier(.68,-0.55,.27,1.55), opacity 0.8s;
+}
+
+.bouquet.show {
+    top: 60px;
+    opacity: 1;
+}
+
+.message-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+}
+
+.main-message {
+    background: rgba(255,255,255,0.7);
+    border-radius: 24px;
+    padding: 2.5rem 2rem 2rem 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    text-align: center;
+    font-family: 'Kalam', 'Indie Flower', cursive, sans-serif;
+    font-size: 2.2rem;
+    color: #6d3b1a;
+    letter-spacing: 0.05em;
+    margin-top: 40px;
+    max-width: 90vw;
 }
 
 .main-message h1 {
-    font-family: 'Kalam', cursive;
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    font-size: 2.5rem;
+    margin-bottom: 1.2rem;
+    font-family: 'Kalam', 'Indie Flower', cursive, sans-serif;
+    color: #b85c38;
+    text-shadow: 0 2px 8px #fff8, 0 0 2px #fff8;
+}
+
+.main-message p {
+    font-size: 1.3rem;
+    color: #6d3b1a;
+    margin: 0;
+    font-family: 'Kalam', 'Indie Flower', cursive, sans-serif;
 }
 
 .thank-you-message {
@@ -517,17 +595,64 @@ body {
 }
 
 .clover-icon {
-    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
+    opacity: 0.7;
+    transition: opacity 0.3s, transform 0.3s;
 }
 
 .clover-icon:hover {
     opacity: 1;
+    transform: scale(1.15) rotate(-8deg);
 }
 
 /* ユーティリティクラス */
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.petal, .light-particle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0.85;
+    will-change: transform, opacity;
+}
+.petal {
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(ellipse at center, #ffb6c1 60%, #fff0 100%);
+    border-radius: 60% 70% 60% 70%/70% 60% 70% 60%;
+    animation: petal-float 1.8s ease-out forwards;
+}
+.light-particle {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle, #fffbe8 60%, #fff0 100%);
+    border-radius: 50%;
+    animation: light-float 1.2s ease-out forwards;
+}
+@keyframes petal-float {
+    0% { opacity: 0.85; transform: scale(0.7) translateY(0); }
+    60% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.2) translateY(-60px) translateX(30px); }
+}
+@keyframes light-float {
+    0% { opacity: 0.7; transform: scale(0.7) translateY(0); }
+    60% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.1) translateY(-40px) translateX(-20px); }
 } 

@@ -22,14 +22,18 @@
 
     <!-- フェーズ2：メッセージ表示 -->
     <section id="message-section" class="hidden">
+        <div class="message-bg">
+            <img src="images/flower-bg.png" alt="背景の花" class="bg-flower">
+            <img src="images/memory1.jpg" alt="思い出" class="bg-memory">
+        </div>
+        <canvas id="bubble-canvas"></canvas>
+        <img src="images/flower-bouquet.png" alt="花束" id="bouquet" class="bouquet hidden">
         <div class="message-container">
-            <div class="scratch-cover" id="scratch-cover">
-                <div class="message-content">
-                    <h2>Happy Birthday Mom!</h2>
-                    <p>Thank you for everything you've done for us.</p>
-                    <p>We love you so much!</p>
-                </div>
+            <div class="main-message">
+                <h1>お母さん、お誕生日おめでとう！</h1>
+                <p>いつも本当にありがとう。<br>これからも元気でいてね。</p>
             </div>
+            <canvas id="scratch-cover" class="scratch-cover"></canvas>
         </div>
     </section>
 
@@ -61,6 +65,15 @@
         <button class="bgm-control" id="bgm-control">
             <span class="music-note" id="music-note">♪</span>
         </button>
+        <div class="clover-icon" title="幸運のクローバー">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" fill="#4CAF50"/>
+                <circle cx="22" cy="10" r="7" fill="#4CAF50"/>
+                <circle cx="10" cy="22" r="7" fill="#4CAF50"/>
+                <circle cx="22" cy="22" r="7" fill="#4CAF50"/>
+                <rect x="15" y="22" width="2" height="8" rx="1" fill="#388E3C"/>
+            </svg>
+        </div>
     </div>
 
     <!-- 音声ファイル -->
@@ -76,6 +89,8 @@
     <audio id="scratch-sound">
         <source src="audio/scratch_sound.mp3" type="audio/mpeg">
     </audio>
+
+    <div class="confetti-container"></div>
 
     <script src="js/script.js"></script>
 </body>

@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const giftBoxTop = document.getElementById('gift-box-top');
     const lightEffect = document.getElementById('light-effect');
 
+    // 必須要素がなければ何もしない
+    if (!giftBox || !giftBoxTop || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect) {
+        console.warn('一部の要素が見つかりません。');
+        return;
+    }
+
     // フェードイン/フェードアウトの時間（ミリ秒）
     const FADE_DURATION = 1000;
 
@@ -39,85 +45,98 @@ document.addEventListener('DOMContentLoaded', () => {
         isBgmPlaying = !isBgmPlaying;
     });
 
-    // ギフトボックスのクリックイベント
-    giftBox.addEventListener('click', () => {
+    // ギフトボックスのクリックイベントを削除し、openingSection全体にイベントを付与
+    openingSection.addEventListener('click', () => {
         if (isBoxOpened) return;
-        
-        // 蓋のアニメーション
-        giftBoxTop.style.opacity = '1';
-        giftBoxTop.classList.add('open');
-        
-        // 光のエフェクト
-        lightEffect.classList.add('active');
-        
-        // サウンド再生
-        boxOpenSound.play();
-        
-        // 状態更新
         isBoxOpened = true;
-        
-        // セクション切り替え
-        setTimeout(() => {
-            openingSection.style.display = 'none';
-            messageSection.style.display = 'flex';
-        }, 1500);
+        alert('画面がクリックされました！次の演出に進みます。');
+        openingSection.style.display = 'none';
+        messageSection.classList.remove('hidden');
+        messageSection.style.display = 'flex';
+        messageSection.classList.add('fade-in');
     });
 
     // スクラッチカバー
     const scratchCover = document.getElementById('scratch-cover');
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
+    const bouquet = document.getElementById('bouquet');
+    if (scratchCover) {
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let scratched = 0;
+        const ctx = scratchCover.getContext('2d');
 
-    function initScratchCover() {
-        canvas.width = scratchCover.offsetWidth;
-        canvas.height = scratchCover.offsetHeight;
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        scratchCover.appendChild(canvas);
-    }
-
-    function scratch(e) {
-        if (!isDrawing) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-        
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // スクラッチ音を再生
-        if (!scratchSound.playing) {
-            scratchSound.currentTime = 0;
-            scratchSound.play();
+        function resizeScratch() {
+            scratchCover.width = window.innerWidth;
+            scratchCover.height = window.innerHeight;
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.fillRect(0, 0, scratchCover.width, scratchCover.height);
         }
-        
-        lastX = x;
-        lastY = y;
+
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 32, 0, Math.PI * 2);
+            ctx.fill();
+            scratched++;
+        }
+
+        function getXY(e) {
+            if (e.touches && e.touches.length > 0) {
+                return [e.touches[0].clientX, e.touches[0].clientY];
+            } else {
+                return [e.clientX, e.clientY];
+            }
+        }
+
+        scratchCover.addEventListener('mousedown', e => {
+            isDrawing = true;
+            const [x, y] = getXY(e);
+            scratch(x, y);
+        });
+        scratchCover.addEventListener('mousemove', e => {
+            if (!isDrawing) return;
+            const [x, y] = getXY(e);
+            scratch(x, y);
+        });
+        scratchCover.addEventListener('mouseup', () => isDrawing = false);
+        scratchCover.addEventListener('mouseleave', () => isDrawing = false);
+
+        scratchCover.addEventListener('touchstart', e => {
+            isDrawing = true;
+            const [x, y] = getXY(e);
+            scratch(x, y);
+        });
+        scratchCover.addEventListener('touchmove', e => {
+            if (!isDrawing) return;
+            const [x, y] = getXY(e);
+            scratch(x, y);
+        });
+        scratchCover.addEventListener('touchend', () => isDrawing = false);
+
+        window.addEventListener('resize', resizeScratch);
+        resizeScratch();
+
+        // 一定以上削ったらカバーを消す
+        function checkScratchClear() {
+            const imageData = ctx.getImageData(0, 0, scratchCover.width, scratchCover.height);
+            let clearPixels = 0;
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                if (imageData.data[i + 3] < 128) clearPixels++;
+            }
+            if (clearPixels > imageData.data.length / 8) {
+                scratchCover.style.transition = 'opacity 0.7s';
+                scratchCover.style.opacity = 0;
+                setTimeout(() => {
+                    scratchCover.style.display = 'none';
+                    // 花束アニメーション
+                    if (bouquet) bouquet.classList.add('show');
+                }, 800);
+            }
+        }
+        scratchCover.addEventListener('mousemove', checkScratchClear);
+        scratchCover.addEventListener('touchmove', checkScratchClear);
     }
-
-    // タッチイベント
-    canvas.addEventListener('mousedown', (e) => {
-        isDrawing = true;
-        scratch(e);
-    });
-
-    canvas.addEventListener('mousemove', scratch);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseleave', () => isDrawing = false);
-
-    canvas.addEventListener('touchstart', (e) => {
-        isDrawing = true;
-        scratch(e);
-    });
-
-    canvas.addEventListener('touchmove', scratch);
-    canvas.addEventListener('touchend', () => isDrawing = false);
 
     // アルバムセクション
     const albumPages = document.querySelectorAll('.album-page');
@@ -162,12 +181,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初期化
     function init() {
-        initScratchCover();
+        // 要素の初期状態設定
+        messageSection.style.display = 'none';
+        albumSection.style.display = 'none';
+        
+        // スクラッチカバーの初期化
+        resizeScratch();
+        
+        // アルバムの初期ページ表示
         showPage(0);
     }
 
-    // ページ読み込み完了時に初期化
-    window.addEventListener('load', init);
+    // 初期化の実行
+    init();
 
     // 星の生成
     function createStars() {
@@ -266,16 +292,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // シャボン玉の生成
-    function createBubbles() {
-        const bubblesContainer = document.querySelector('.bubbles');
-        for (let i = 0; i < 10; i++) {
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.style.left = Math.random() * 100 + 'vw';
-            bubble.style.animationDelay = Math.random() * 4 + 's';
-            bubblesContainer.appendChild(bubble);
+    // シャボン玉アニメーション
+    const bubbleCanvas = document.getElementById('bubble-canvas');
+    if (bubbleCanvas) {
+        const ctx = bubbleCanvas.getContext('2d');
+        let bubbles = [];
+        function resizeBubbleCanvas() {
+            bubbleCanvas.width = window.innerWidth;
+            bubbleCanvas.height = window.innerHeight;
         }
+        function createBubbles() {
+            bubbles = [];
+            for (let i = 0; i < 18; i++) {
+                bubbles.push({
+                    x: Math.random() * bubbleCanvas.width,
+                    y: bubbleCanvas.height + Math.random() * 200,
+                    r: 18 + Math.random() * 22,
+                    speed: 0.7 + Math.random() * 1.2,
+                    drift: (Math.random() - 0.5) * 0.7,
+                    alpha: 0.25 + Math.random() * 0.25
+                });
+            }
+        }
+        function drawBubbles() {
+            ctx.clearRect(0, 0, bubbleCanvas.width, bubbleCanvas.height);
+            for (const b of bubbles) {
+                ctx.save();
+                ctx.globalAlpha = b.alpha;
+                const grad = ctx.createRadialGradient(b.x, b.y, b.r * 0.2, b.x, b.y, b.r);
+                grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+                grad.addColorStop(1, 'rgba(173,216,230,0.2)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        function updateBubbles() {
+            for (const b of bubbles) {
+                b.y -= b.speed;
+                b.x += b.drift;
+                if (b.y + b.r < 0) {
+                    b.x = Math.random() * bubbleCanvas.width;
+                    b.y = bubbleCanvas.height + Math.random() * 100;
+                }
+            }
+        }
+        function animate() {
+            updateBubbles();
+            drawBubbles();
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', () => {
+            resizeBubbleCanvas();
+            createBubbles();
+        });
+        resizeBubbleCanvas();
+        createBubbles();
+        animate();
     }
 
     // メッセージカードのテキスト
@@ -506,4 +581,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初期化
     createConfetti();
+
+    // 花びら・光の粒インタラクション
+    if (messageSection) {
+        function spawnParticle(x, y) {
+            const isPetal = Math.random() < 0.6;
+            const el = document.createElement('div');
+            el.className = isPetal ? 'petal' : 'light-particle';
+            el.style.left = (x - 14) + 'px';
+            el.style.top = (y - 14) + 'px';
+            messageSection.appendChild(el);
+            setTimeout(() => el.remove(), isPetal ? 1800 : 1200);
+        }
+        // PC: マウス移動
+        messageSection.addEventListener('mousemove', e => {
+            if (e.buttons !== 0) return; // ドラッグ中は無視
+            spawnParticle(e.clientX, e.clientY);
+        });
+        // スマホ: タッチ移動
+        messageSection.addEventListener('touchmove', e => {
+            if (e.touches.length > 0) {
+                const t = e.touches[0];
+                spawnParticle(t.clientX, t.clientY);
+            }
+        });
+    }
 }); 
