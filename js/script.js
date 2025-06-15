@@ -208,7 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const slides = document.querySelectorAll('.slide-image');
         const totalSlides = slides.length;
 
+        // スクラッチ中はスライド切り替えを無効化
+        let isScratching = true;
+
         function showSlide(index) {
+            if (isScratching) return; // スクラッチ中は切り替えを無効化
+            
             slides.forEach((slide, i) => {
                 if (i === index) {
                     slide.classList.add('active');
@@ -227,26 +232,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // スワイプ検出
         let touchStartX = 0;
+        let touchStartY = 0;
         let touchEndX = 0;
+        let touchEndY = 0;
 
         messageSection.addEventListener('touchstart', (e) => {
+            if (isScratching) return; // スクラッチ中はスワイプを無効化
             touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
         });
 
         messageSection.addEventListener('touchend', (e) => {
+            if (isScratching) return; // スクラッチ中はスワイプを無効化
             touchEndX = e.changedTouches[0].clientX;
+            touchEndY = e.changedTouches[0].clientY;
             handleSwipe();
         });
 
         function handleSwipe() {
-            const swipeThreshold = 50;
-            const diff = touchStartX - touchEndX;
+            if (isScratching) return; // スクラッチ中はスワイプを無効化
             
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0 && currentSlide < totalSlides - 1) {
+            const swipeThreshold = 50;
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+            
+            // 上スワイプの検出（最後のスライドの場合）
+            if (currentSlide === totalSlides - 1 && diffY > swipeThreshold) {
+                const lastSlide = slides[currentSlide];
+                lastSlide.classList.add('slide-up');
+                
+                setTimeout(() => {
+                    window.location.href = 'album.html';
+                }, 1000);
+                return;
+            }
+            
+            // 左右のスワイプ処理
+            if (Math.abs(diffX) > swipeThreshold) {
+                if (diffX > 0 && currentSlide < totalSlides - 1) {
                     // 左スワイプ
                     currentSlide++;
-                } else if (diff < 0 && currentSlide > 0) {
+                } else if (diffX < 0 && currentSlide > 0) {
                     // 右スワイプ
                     currentSlide--;
                 }
@@ -257,19 +283,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // マウスでのドラッグもサポート
         let isDragging = false;
         let startX = 0;
+        let startY = 0;
 
         messageSection.addEventListener('mousedown', (e) => {
+            if (isScratching) return; // スクラッチ中はドラッグを無効化
             isDragging = true;
             startX = e.clientX;
+            startY = e.clientY;
         });
 
         messageSection.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const diff = startX - e.clientX;
-            if (Math.abs(diff) > 50) {
-                if (diff > 0 && currentSlide < totalSlides - 1) {
+            if (!isDragging || isScratching) return; // スクラッチ中はドラッグを無効化
+            const diffX = startX - e.clientX;
+            const diffY = startY - e.clientY;
+            
+            // 上ドラッグの検出（最後のスライドの場合）
+            if (currentSlide === totalSlides - 1 && diffY > 50) {
+                const lastSlide = slides[currentSlide];
+                lastSlide.classList.add('slide-up');
+                
+                setTimeout(() => {
+                    window.location.href = 'album.html';
+                }, 1000);
+                isDragging = false;
+                return;
+            }
+            
+            // 左右のドラッグ処理
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0 && currentSlide < totalSlides - 1) {
                     currentSlide++;
-                } else if (diff < 0 && currentSlide > 0) {
+                } else if (diffX < 0 && currentSlide > 0) {
                     currentSlide--;
                 }
                 showSlide(currentSlide);
@@ -283,6 +327,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageSection.addEventListener('mouseleave', () => {
             isDragging = false;
+        });
+
+        // スクラッチ完了時の処理
+        function onScratchComplete() {
+            isScratching = false; // スクラッチ完了後、スライド切り替えを有効化
+        }
+
+        // スクラッチ完了を検知
+        scratchCover.addEventListener('transitionend', () => {
+            if (scratchCover.style.opacity === '0') {
+                onScratchComplete();
+            }
         });
     }
 

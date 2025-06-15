@@ -141,6 +141,8 @@ body {
     background: linear-gradient(135deg, #FFD1DC, #FFFACD);
     opacity: 0;
     transition: opacity 1s ease;
+    z-index: 10;
+    overflow-y: auto;
 }
 
 .message-section.fade-in {
@@ -286,28 +288,68 @@ body {
 }
 
 /* フェーズ3：アルバム */
-.album-section {
+#album-section {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #FFD1DC, #FFFACD);
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1s ease, transform 1s ease;
+    z-index: 10;
+    overflow-y: auto;
+    transform: translateY(100%);
+    display: none;
 }
 
-.album-section.fade-in {
+#album-section.show {
     opacity: 1;
+    transform: translateY(0);
+    display: block;
 }
 
 .album-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.album-title {
+    text-align: center;
+    color: #FF69B4;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.photo-item {
     position: relative;
+    padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.photo-item:hover {
+    transform: scale(1.05);
+}
+
+.photo-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    object-fit: cover;
 }
 
 .album-cover {
@@ -718,6 +760,7 @@ body {
     100% { opacity: 0; transform: scale(1.2) translateY(-40px); }
 }
 
+/* スライド関連のスタイル */
 .slide-container {
     position: absolute;
     top: 0;
@@ -749,4 +792,8 @@ body {
 
 .slide-image.prev {
     transform: translateX(-100%);
+}
+
+.slide-image.slide-up {
+    transform: translateY(-100%);
 } 
