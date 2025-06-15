@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 要素の取得
-    const giftBox = document.getElementById('gift-box');
     const openingSection = document.getElementById('opening-section');
     const messageSection = document.getElementById('message-section');
     const albumSection = document.getElementById('album-section');
@@ -20,8 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const giftBoxTop = document.getElementById('gift-box-top');
     const lightEffect = document.getElementById('light-effect');
 
-    // 必須要素がなければ何もしない
-    if (!giftBox || !giftBoxTop || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect) {
+    // 存在チェックからgiftBoxを除外
+    if (!giftBoxTop || !openingSection || !messageSection || !bgmControl || !musicNote || !lightEffect) {
         console.warn('一部の要素が見つかりません。');
         return;
     }
@@ -45,16 +44,41 @@ document.addEventListener('DOMContentLoaded', () => {
         isBgmPlaying = !isBgmPlaying;
     });
 
-    // ギフトボックスのクリックイベントを削除し、openingSection全体にイベントを付与
-    openingSection.addEventListener('click', () => {
-        if (isBoxOpened) return;
-        isBoxOpened = true;
-        alert('画面がクリックされました！次の演出に進みます。');
-        openingSection.style.display = 'none';
-        messageSection.classList.remove('hidden');
-        messageSection.style.display = 'flex';
-        messageSection.classList.add('fade-in');
-    });
+    // オープニング演出
+    if (openingSection && giftBoxTop && lightEffect && confettiContainer) {
+        openingSection.addEventListener('click', () => {
+            if (isBoxOpened) return;
+            isBoxOpened = true;
+            // 1. 蓋を持ち上げる
+            giftBoxTop.classList.add('lift');
+            // 2. 光バースト
+            setTimeout(() => {
+                lightEffect.classList.add('active');
+            }, 900);
+            // 3. 紙吹雪
+            setTimeout(() => {
+                for (let i = 0; i < 48; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = `hsl(${Math.random()*360},80%,70%)`;
+                    confetti.style.animationDelay = (Math.random()*0.7) + 's';
+                    confettiContainer.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 2000);
+                }
+            }, 1200);
+            // 4. 次の画面へ遷移
+            setTimeout(() => {
+                openingSection.style.display = 'none';
+                const messageSection = document.getElementById('message-section');
+                if (messageSection) {
+                    messageSection.classList.remove('hidden');
+                    messageSection.style.display = 'flex';
+                    messageSection.classList.add('fade-in');
+                }
+            }, 2000);
+        });
+    }
 
     // スクラッチカバー
     const scratchCover = document.getElementById('scratch-cover');
